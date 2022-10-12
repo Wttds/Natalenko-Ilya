@@ -1,9 +1,11 @@
 def main():
     banks = []
     num_of_banks = int(input())
+    names = input().split()
+    indexes = input().split()
+    sums = input().split()
     for i in range(num_of_banks):
-        data = input("Введите название банка и кол-во денег в сейфе через пробел")
-        banks.append((data.split()[0], i, int(data.split()[1])))
+        banks.append((names[i], int(indexes[i]), int(sums[i])))
         
     summary, maximum, route, max_route, inds, max_inds = 0, 0, [], [], [], []
     
