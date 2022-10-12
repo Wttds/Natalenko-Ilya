@@ -2,7 +2,7 @@ def main():
     banks = []
     num_of_banks = int(input())
     for i in range(num_of_banks):
-        data = input()
+        data = input("Введите название банка и кол-во денег в сейфе через пробел")
         banks.append((data.split()[0], i, int(data.split()[1])))
         
     summary, maximum, route, max_route, inds, max_inds = 0, 0, [], [], [], []
