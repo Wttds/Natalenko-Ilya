@@ -68,8 +68,65 @@ if __name__ == "__main__":
 ```
 ________
 # Задание 7_3
-
+Вернуть все элементы матрицы в спиральном порядке.
 # Листинг 7_3
 ```Py
+def f(matrix):
+    were = ['00']
+    direction = 'right'
+    i, j, = 0, 0
+    output = [matrix[i][j]]
+    for _ in range(len(matrix) ** 2 - 1):
+        if direction == 'right':
+            if str(i) + str(j + 1) not in were and j + 1 < len(matrix):
+                were.append(str(i) + str(j + 1))
+                output.append(matrix[i][j + 1])
+                j += 1
+            else:
+                direction = 'down'
+                were.append(str(i + 1) + str(j))
+                output.append(matrix[i + 1][j])
+                i += 1
+            continue
 
+        if direction == 'down':
+            if str(i + 1) + str(j) not in were and i + 1 < len(matrix):
+                were.append(str(i + 1) + str(j))
+                output.append(matrix[i + 1][j])
+                i += 1
+            else:
+                direction = 'left'
+                were.append(str(i) + str(j - 1))
+                output.append(matrix[i][j - 1])
+                j -= 1
+            continue
+
+        if direction == 'left':
+            if str(i) + str(j - 1) not in were and j - 1 >= 0:
+                were.append(str(i) + str(j - 1))
+                output.append(matrix[i][j - 1])
+                j -= 1
+            else:
+                direction = 'up'
+                were.append(str(i - 1) + str(j))
+                output.append(matrix[i - 1][j])
+                i -= 1
+            continue
+
+        if direction == 'up':
+            if str(i - 1) + str(j) not in were:
+                were.append(str(i - 1) + str(j))
+                output.append(matrix[i - 1][j])
+                i -= 1
+            else:
+                direction = 'up'
+                were.append(str(i) + str(j + 1))
+                output.append(matrix[i][j + 1])
+                j += 1
+            continue
+    return output
+
+
+if __name__ == "__main__":
+    print(f([[1, 2, 3], [8, 9, 4], [7, 6, 5]]))
 ```
