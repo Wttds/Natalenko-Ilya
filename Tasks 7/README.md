@@ -44,10 +44,27 @@ if __name__ == "__main__":
 ```
 ________
 # Задание 7_2
-
+Поворот матрицы по часовой стрелке.
 # Листинг 7_2
 ```Py
+def f(matrix):
+    transposed_matrix = []
+    for i in range(len(matrix)):
+        transposed_matrix.append([])
+        for j in range(len(matrix)):
+            transposed_matrix[i].append(matrix[len(matrix) - 1 - i][j])
+    print(transposed_matrix)
 
+    reversed_matrix = []
+    for i in range(len(matrix)):
+        reversed_matrix.append([])
+        for g in range(len(matrix)):
+            reversed_matrix[i].append(transposed_matrix[g][i])
+    return reversed_matrix
+
+
+if __name__ == "__main__":
+    print(f([[1, 2, 3, 4],[5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]))
 ```
 ________
 # Задание 7_3
