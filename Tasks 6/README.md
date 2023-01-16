@@ -159,6 +159,26 @@ Output:
 [['a', 'a'], ['']]
 # Листинг 6_3
 ```Py
+from itertools import permutations
 
+
+def main():
+    items, output = eval(input()), []
+    for item in items:
+        marker = False
+        for array in output:
+            for variant in permutations(array[0]):
+                variant = ''.join(list(variant))
+                if item in variant and len(item) == len(array[0]):
+                    marker = True
+                    array.append(item)
+                    break
+        if not marker:
+            output.append([item])
+    print(output)
+
+
+if __name__ == "__main__":
+    main()
 ```
 ________
