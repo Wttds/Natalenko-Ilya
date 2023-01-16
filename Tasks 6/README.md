@@ -119,7 +119,20 @@ Output:
 
 # Листинг 6_2
 ```Py
+from itertools import permutations
 
+
+def main():
+    items, output = eval(input()), []
+    for x in permutations(items):
+        x = list(x)
+        if x not in output:
+            output.append(x)
+    print(output)
+
+
+if __name__ == '__main__':
+    main()
 ```
 ________
 # Задание 6_3
