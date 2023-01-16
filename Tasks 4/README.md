@@ -20,6 +20,9 @@ ________
 
 ![image](https://user-images.githubusercontent.com/115029692/212713556-81011a01-6e58-433e-9743-2bc5c85d2e74.png)
 
+Input: перфекционист, 3
+
+Output: пеотефкинсрци
 # Листинг 4_3
 ```Py
 
