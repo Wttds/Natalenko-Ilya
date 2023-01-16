@@ -57,7 +57,38 @@ Output:
 5
 # Листинг 6_1
 ```Py
+def main():
+    number = int(input())
+    bin_nums = []
+    for i in range(2 ** number):
+        binary = format(i, "b")
+        while len(binary) < number:
+            binary = '0' + binary
+        if binary.count('1') == 4:
+            bin_nums.append(binary)
+    print(bin_nums)
 
+    arr = eval(input())
+    aim = int(input())
+    closest = None
+    closest_arr = []
+    for comb in bin_nums:
+        summary, temp = 0, []
+        for d in range(number):
+            if comb[d] == '1':
+                summary += arr[d]
+                temp.append(arr[d])
+        if not closest:
+            closest, closest_arr = abs(aim - summary), temp[:]
+        else:
+            distance = abs(aim - summary)
+            if distance < closest:
+                closest, closest_arr = distance, temp[:]
+    print(closest_arr, sum(closest_arr), sep='\n')
+
+
+if __name__ == "__main__":
+    main()
 ```
 ________
 # Задание 6_2
