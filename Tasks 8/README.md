@@ -23,10 +23,28 @@ if __name__ == "__main__":
 ```
 ________
 # Задание 8_2
-
+Функция получает список элементов. Любой элемент может встречаться более одного раза.
+Вернуть количество подмножеств, не содержащих повторяющихся элементов, не включая пустое множество. И сами подмножества.
 # Листинг 8_2
 ```Py
+def main():
+    arr = list(set(eval(input())))
+    output = list()
+    for i in range(1, 2 ** len(arr)):
+        temp_list = list()
+        binary = (len(arr) - len(str(format(i, "b")))) * "0" + str(format(i, "b"))
+        for digit in range(len(binary)):
+            if binary[digit] == "1":
+                temp_list.append(arr[digit])
+        output.append(temp_list)
+    output = list(map(set, sorted(output, key=len, reverse=True)[::-1]))
+    print("Подмножества:", end="{")
+    print(*output, sep=", ", end="}\n")
+    print(f"Количество подмножеств: {len(output)}")
 
+
+if __name__ == "__main__":
+    main()
 ```
 ________
 # Задание 8_3
