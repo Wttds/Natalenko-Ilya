@@ -3,40 +3,18 @@ from random import randint, choice
 
 
 class Ship:
-    def __init__(self, length, tp=1, x=None, y=None):
+    def __init__(self, length, tp=1, x=None, y=None): # tp=1 - горизонтально, tp=2 - вертикально
         self._x, self._y = x, y
         self._length = length
         self._tp = tp
         self._is_move = True
-        self._cells = [1] * length
-        self._coords, self._coords_around = [], []
-        if self._x is not None and self._y is not None:
-            if self._tp == 1:
-                self._coords = set((a, self._y) for a in range(self._x, self._x + length))
-                self._coords_around = set((a, b) for a in range(self._x - 1, self._x + length + 1)
-                                      for b in range(self._y - 1, self._y + 2))
-            else:
-                self._coords = set((self._x, b) for b in range(self._y, self._y + length))
-                self._coords_around = set((a, b) for a in range(self._x - 1, self._x + 2)
-                                      for b in range(self._y - 1, self._y + length + 1))
-
-    def get_start_coords(self):
-        return (self._x, self._y)
+        self._cells = [1 for _ in range(length)]
 
     def set_start_coords(self, x, y):
         self._x, self._y = x, y
 
-    def is_collide(self, ship):
-        for coords in self._coords:
-            if coords in ship._coords_around:
-                return True
-        return False
-
-    def is_out_pole(self, size=10):
-        for coords in self._coords:
-            if coords[0] < 0 or coords[0] >= size or coords[1] < 0 or coords[1] >= size:
-                return True
-        return False
+    def get_start_coords(self):
+        return (self._x, self._y)
 
     def move(self, go):
         if self._is_move:
@@ -45,95 +23,149 @@ class Ship:
             else:
                 self._y += go
 
-    def __getitem__(self, indx):
-        return self._cells[indx]
+    # Возвращает True, если корабли пересекаются, в противном случае False
+    def is_collide(self, other):
+        gabarites_1, gabarites_2 = [], []
 
-    def __setitem__(self, indx, value):
-        self._cells[indx] = value
+        if self._tp == 1:
+            for a in range(-1, 2):
+                gabarites_1 += [(x, self._y + a) for x in range(self._x - 1, self._x + self._length + 1)]
+            gabarites_2 += [(x, other._y) for x in range(other._x, other._x + other._length)]
+        else:
+            for a in range(-1, 2):
+                gabarites_1 += [(self._x, y) for y in range(self._y - 1, self._y + self._length + 1)]
+            gabarites_2 += [(other._x, y) for y in range(other._y, other._y + other._length)]
 
+        intersection = set(gabarites_1).intersection(set(gabarites_2))
+        return len(intersection) > 0
+        # Корабли не могут пересекаться, если их типы различны
 
-class GamePole:
-    def __init__(self, size):
+        # if self._tp == 1 and other._tp == 1:  # оба корабля горизонтальные
+        #     if self._y != other._y:  # корабли на разных строках
+        #         return False
+        #     if self._x > other._x:
+        #         self, other = other, self  # self должен быть слева
+        #     return self._x + self._length > other._x
+        # elif self._tp == 2 and other._tp == 2:  # оба корабля вертикальные
+        #     if self._x != other._x:  # корабли в разных столбцах
+        #         return False
+        #     if self._y > other._y:
+        #         self, other = other, self  # self должен быть сверху
+        #     return self._y + self._length > other._y
+        # else:  # корабли перпендикулярны
+        #     if self._tp == 1:  # self - горизонтальный, other - вертикальный
+        #         horiz, vert = self, other
+        #     else:  # self - вертикальный, other - горизонтальный
+        #         horiz, vert = other, self
+        #     if horiz._y <= vert._y <= horiz._y + horiz._length and \
+        #             vert._x <= horiz._x <= vert._x + vert._length:
+        #         return True
+        # return False
+        # coo1 = []
+        # if self._tp == 1:
+        #     for i in range(-1, 2):
+        #         coo1 += [(x, self._y + i) for x in range(self._x - 1, self._x + self._length + 1)]
+        # else:
+        #     for i in range(-1, 2):
+        #         coo1 += [(self._x + i, y) for y in range(self._y - 1, self._y + self._length + 1)]
+        #
+        # if other._tp == 1:
+        #     coo2 = [(x, other._y) for x in range(other._x, other._x + other._length)]
+        # else:
+        #     coo2 = [(other._x, y) for y in range(other._y, other._y + other._length)]
+        #
+        # return len(set(coo1) & set(coo2)) > 0
+
+    # Возвращает True, если корабль хотя бы частично находитсся вне поля, в противном случае False
+    def is_out_pole(self, size):
+        pole = [(x, y) for x in range(size) for y in range(size)]
+
+        if self._tp == 1:
+            ship = [(x, self._y) for x in range(self._x, self._x + self._length)]
+        else:
+            ship = [(self._x, y) for y in range(self._y, self._y + self._length)]
+
+        return len(set(ship) - set(pole)) > 0
+
+    def __getitem__(self, key):
+        return self._cells[key]
+
+    def __setitem__(self, key, value):
+        self._cells[key] = value
+
+class GamePole():
+    # Инициализация класса
+    def __init__(self, size=10):
         self._size = size
         self._ships = []
 
+    # Инициализация самого поля
     def init(self):
-        self._ships = [Ship(4, tp=randint(1, 2)), Ship(3, tp=randint(1, 2)), Ship(3, tp=randint(1, 2)),
-                       Ship(2, tp=randint(1, 2)), Ship(2, tp=randint(1, 2)), Ship(2, tp=randint(1, 2)),
-                       Ship(1, tp=randint(1, 2)), Ship(1, tp=randint(1, 2)), Ship(1, tp=randint(1, 2)),
-                       Ship(1, tp=randint(1, 2))]
-
-
-        for ship in self._ships:
-            valid = False
-            while not valid:
-                valid = True
-                ship.__init__(ship._length, ship._tp, randint(0, self._size - 1), randint(0, self._size - 1))
-                for other_ship in list(filter(lambda s: id(s) != id(ship), self._ships)):
-                    if ship.is_collide(other_ship) or ship.is_out_pole(self._size):
-                        valid = False
+        for i in range(1, 5):       # Количество палуб
+            for j in range(5 - i):  # Количество i-палубных кораблей
+                while True:
+                    ship = Ship(length=i, tp=randint(1,2))
+                    x, y = randint(0, self._size - 1), randint(0, self._size - 1)
+                    ship.set_start_coords(x, y)
+                    if not (ship.is_out_pole(self._size) or any([ship.is_collide(other) for other in self._ships])):
+                        self._ships.append(ship)
                         break
 
-    def get_ships(self):  # Геттер
+    def get_ships(self):
         return self._ships
 
-    def move_ships(self):
-        for ship in self._ships:
-            go = choice([-1, 1])
-            ship.move(go)
-            ship.__init__(ship._length, ship._tp, ship._x, ship._y)
-            for other_ship in list(filter(lambda s: id(s) != id(ship), self._ships)):
-                if ship.is_collide(other_ship) or ship.is_out_pole(self._size):
-                    go = -go
-                    break
-            ship.move(go)
-            ship.move(go)
-            ship.__init__(ship._length, ship._tp, ship._x, ship._y)
-            for other_ship in list(filter(lambda s: id(s) != id(ship), self._ships)):
-                if ship.is_collide(other_ship) or ship.is_out_pole(self._size):
-                    go = -go
-            ship.move(go)
+    def fill_pole(self):
+        ships_coords, pole = [], []
+        for ship in self._ships:  # Узнаём координаты всех палуб всех кораблей
+            for p in range(ship._length):
+                if ship._tp == 1:
+                    ships_coords.append((ship._x + p, ship._y))
+                else:
+                    ships_coords.append((ship._x, ship._y + p))
 
+        for y in range(self._size):  # Смотрим, какие координаты есть в списке палуб и ставим 1, если есть, иначе 0
+            pole.append([])
+            for x in range(self._size):
+                if (x, y) in ships_coords:
+                    pole[y].append("1")
+                else:
+                    pole[y].append("0")
+        return pole
+
+    # Вывод доски с кораблями
     def show(self):
-        self._pole = {x: {y: 0 for y in range(self._size)} for x in range(self._size)}
-        for x in range(self._size):
-            for y in range(self._size):
-                if (x, y) in list(map(lambda c: c._coords, self._ships)):
-                    self._pole[x][y] = 1
-                print(self._pole[x][y], end=" ")
-            print()
+        pole = self.fill_pole()
+        for row in pole:
+            print(*row)
 
+    # Получение доски в виде двумерного кортежа
     def get_pole(self):
-        all_ships_coords = list(map(lambda o: o._coords, self._ships))
-        l = []
-        for s in all_ships_coords:
-            l += list(s)
-        tup = []
-        for a in range(self._size):
-            tup.append([])
-            for b in range(self._size):
-                tup[a].append(1) if (a, b) in l else tup[a].append(0)
-        tup = tuple(map(lambda o: tuple(o), tup))
-        return tup
+        pole = self.fill_pole()
+        for row in range(len(pole)):
+            pole[row] = tuple(pole[row])
+        return tuple(pole)
 
-    def __str___(self):
-        field = self.get_pole()
-        for row in field:
-            for col in row:
-                print(field[row][col], end=' ')
-            print()
+    def move_ships(self):
+        for i, ship in enumerate(self._ships):
+            if ship._is_move:
+                step = choice([-1, 1])
+                ship.move(step)
+                if ship.is_out_pole(self._size) or any([ship.is_collide(s) for s in self._ships[:i] + self._ships[i+1:]]):
+                    ship.move(-(2 * step))
+                    if ship.is_out_pole(self._size) or any([ship.is_collide(s) for s in self._ships[:i] + self._ships[i+1:]]):
+                        ship.move(step)
                 
 
 # Tests
-# SIZE_GAME_POLE = 10
-#
-# pole = GamePole(SIZE_GAME_POLE)
-# pole.init()
-# pole.show()
-#
-# pole.move_ships()
-# print()
-# pole.show()
+SIZE_GAME_POLE = 10
+
+pole = GamePole(SIZE_GAME_POLE)
+pole.init()
+pole.show()
+
+pole.move_ships()
+print()
+pole.show()
 
 # Tests
 ship = Ship(2)
